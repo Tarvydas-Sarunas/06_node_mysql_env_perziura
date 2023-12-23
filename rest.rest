@@ -1,6 +1,24 @@
 GET http://localhost:3000
 
-###
-GET http://localhost:3000/api/users
+### sukuria lentele DB
+GET http://localhost:3000/api/admin/create-table
 
-###
+### uzpildo lentele DB
+GET http://localhost:3000/api/admin/populate-posts-table
+
+### sukuria lentele DB ir uzpildo lentele i DB
+GET http://localhost:3000/api/admin/init
+
+### sukurti single post
+POST http://localhost:3000/api/posts/
+Content-Type: application/json
+
+{
+  "title": "Post from REST REST",
+  "author": "James Rest",
+  "date": "2000-01-02",
+  "body": "This is some meaningfull content"
+}
+
+
+
