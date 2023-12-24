@@ -20,5 +20,7 @@ Content-Type: application/json
   "body": "This is some meaningfull content"
 }
 
+### istrinti single post
+DELETE  http://localhost:3000/api/posts/4
 
 

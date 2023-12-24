@@ -134,7 +134,81 @@ app.get('/api/admin/init', async (req, res) => {
 });
 
 // CREATE api/posts/ sukurti posta
-app.post('');
+app.post('/api/posts', async (req, res) => {
+  // pasijamu ka sudeti i table is body
+
+  // const title = req.body.title;
+  // const author = req.body.author;
+  // const date = req.body.date;
+  // const body = req.body.body;
+
+  // pitma pavyzdy kadangi daug pasiemimo is bodzio mes heriau destrukturizuojame
+  const { title, author, date, body } = req.body;
+
+  // galime tureti validacijas
+  if (title.trim() === '') {
+    res.status(400).json({
+      err: 'title is required',
+    });
+    return;
+  }
+
+  // kuriu konekcion
+  let conn;
+  try {
+    conn = await mysql.createConnection(dbConfig);
+    const sql = `INSERT INTO posts 
+    (title, author, date, body) 
+    VALUES (?, ?, ?, ?)`;
+    const [rows] = await conn.execute(sql, [title, author, date, body]);
+    if (rows.affectedRows === 1) {
+      res.sendStatus(201);
+      return;
+    }
+    res.json({ msg: 'no affected rows' });
+  } catch (error) {
+    // jei yra klaida tai klaidos blokas
+    console.log(error);
+    console.log('klaida sukurti posta');
+    res.status(500).json({
+      msg: 'Something went wrong',
+    });
+  } finally {
+    // atsijungti nuo DB jei prisijungimas buvo
+    if (conn) conn.end();
+  }
+});
+
+// DELETE -/api/posts/:pID -delete post
+app.delete('/api/posts/:pID', async (req, res) => {
+  let conn;
+  const pId = +req.params.pID;
+  try {
+    conn = await mysql.createConnection(dbConfig);
+    const delSQL = `
+    DELETE FROM posts 
+    WHERE post_id=?
+    LIMIT 1
+    `;
+    // vykdyti uzklausa
+    const [rezObj] = await conn.execute(delSQL, [pId]);
+    if (rezObj.affectedRows !== 0) {
+      res.sendStatus(202);
+      return;
+    }
+    res.json({ msg: 'no affected rows' });
+  } catch (error) {
+    // jei yra klaida tai klaidos blokas
+    console.log(error);
+    console.log('klaida sukurti posta');
+    res.status(500).json({
+      msg: 'Something went wrong',
+    });
+  } finally {
+    // atsijungti nuo DB jei prisijungimas buvo
+    if (conn) conn.end();
+  }
+});
 
 // 404
 app.use((req, res) => {
