@@ -4,6 +4,7 @@ const morgan = require('morgan');
 const cors = require('cors');
 const mysql = require('mysql2/promise');
 const dbConfig = require('./config');
+const { getDBData } = require('./helper');
 
 const app = express();
 
@@ -131,6 +132,33 @@ app.get('/api/admin/init', async (req, res) => {
     // atsijungti nuo DB jei prisijungimas buvo
     if (conn) conn.end();
   }
+});
+
+// Gauti vvisus posts
+app.get('/api/posts', async (req, res) => {
+  const sql = 'SELECT * FROM `posts`';
+  const [rows, error] = await getDBData(sql);
+  res.json(rows);
+  // let conn;
+  // try {
+  //   // prisijungiu prie DB
+  //   conn = await mysql.createConnection(dbConfig);
+  //   // atlieku veiksma kad parodytu visus postus
+  //   const sql = 'SELECT * FROM `posts`';
+  //   const [rows] = await conn.query(sql);
+  //   // grazinu duomenis
+  //   res.json(rows);
+  // } catch (error) {
+  //   // jei yra klaida tai klaidos blokas
+  //   console.log(error);
+  //   console.log('klaida sukurti posta');
+  //   res.status(500).json({
+  //     msg: 'Something went wrong',
+  //   });
+  // } finally {
+  //   // atsijungti nuo DB jei prisijungimas buvo
+  //   if (conn) conn.end();
+  // }
 });
 
 // CREATE api/posts/ sukurti posta

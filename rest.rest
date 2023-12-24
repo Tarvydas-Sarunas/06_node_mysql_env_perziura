@@ -1,5 +1,8 @@
 GET http://localhost:3000
 
+### pasiimti visus(ALL) posts
+GET http://localhost:3000/api/posts
+
 ### sukuria lentele DB
 GET http://localhost:3000/api/admin/create-table
 
