@@ -4,7 +4,7 @@ const morgan = require('morgan');
 const cors = require('cors');
 const mysql = require('mysql2/promise');
 const dbConfig = require('./config');
-const { getDBData } = require('./helper');
+const { getDBData, dbQueryWithData } = require('./helper');
 
 const app = express();
 
@@ -134,31 +134,52 @@ app.get('/api/admin/init', async (req, res) => {
   }
 });
 
-// Gauti vvisus posts
+// GET /api/posts - Gauti visus posts panaudojant helper funkcija
 app.get('/api/posts', async (req, res) => {
   const sql = 'SELECT * FROM `posts`';
   const [rows, error] = await getDBData(sql);
+
+  console.log('error ===', error);
+
+  if (error) {
+    // turim klaida
+    console.log(error);
+    console.log('klaida sukurti posta');
+    res.status(500).json({
+      msg: 'Something went wrong',
+    });
+    return;
+  }
+  // klaidu nera turim atsakyma is duomenu bazes
   res.json(rows);
-  // let conn;
-  // try {
-  //   // prisijungiu prie DB
-  //   conn = await mysql.createConnection(dbConfig);
-  //   // atlieku veiksma kad parodytu visus postus
-  //   const sql = 'SELECT * FROM `posts`';
-  //   const [rows] = await conn.query(sql);
-  //   // grazinu duomenis
-  //   res.json(rows);
-  // } catch (error) {
-  //   // jei yra klaida tai klaidos blokas
-  //   console.log(error);
-  //   console.log('klaida sukurti posta');
-  //   res.status(500).json({
-  //     msg: 'Something went wrong',
-  //   });
-  // } finally {
-  //   // atsijungti nuo DB jei prisijungimas buvo
-  //   if (conn) conn.end();
-  // }
+});
+
+// GET /api/posts/:Id - Gauti visus posts panaudojant helper funkcija
+app.get('/api/posts/:Id', async (req, res) => {
+  const sql = 'SELECT * FROM `posts` WHERE post_id=?';
+  const id = +req.params.Id;
+
+  const [rows, error] = await dbQueryWithData(sql, [id]);
+
+  if (error) {
+    // turim klaida
+    console.log(error);
+    console.log('klaida sukurti posta');
+    res.status(500).json({
+      msg: 'Something went wrong',
+    });
+    return;
+  }
+  if (rows.length === 1) {
+    res.json(rows[0]);
+    return;
+  }
+  if (rows.length === 0) {
+    res.status(404).json('not found');
+    return;
+  }
+  // klaidu nera turim atsakyma is duomenu bazes
+  res.status(500).json('something was wrong');
 });
 
 // CREATE api/posts/ sukurti posta
