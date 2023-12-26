@@ -154,7 +154,7 @@ app.get('/api/posts', async (req, res) => {
   res.json(rows);
 });
 
-// GET /api/posts/:Id - Gauti visus posts panaudojant helper funkcija
+// GET /api/posts/:Id - Gauti viena posts panaudojant helper funkcija
 app.get('/api/posts/:Id', async (req, res) => {
   const sql = 'SELECT * FROM `posts` WHERE post_id=?';
   const id = +req.params.Id;
@@ -257,6 +257,35 @@ app.delete('/api/posts/:pID', async (req, res) => {
     // atsijungti nuo DB jei prisijungimas buvo
     if (conn) conn.end();
   }
+});
+
+// Update - /api/posts/:Id - update viena posta
+app.put('/api/posts/:Id', async (req, res) => {
+  const id = +req.params.Id;
+  const { title, author } = req.body;
+
+  const sql = `UPDATE posts 
+  SET title=?, author=?
+  WHERE post_id=?
+  LIMIT 1`;
+
+  const [rows, error] = await dbQueryWithData(sql, [title, author, id]);
+
+  if (error) {
+    // turim klaida
+    console.log(error);
+    console.log('klaida sukurti posta');
+    res.status(500).json({
+      msg: 'Something went wrong',
+    });
+    return;
+  }
+  if (rows.affectedRows === 0) {
+    res.status(400).json('not found');
+    return;
+  }
+  res.status(204).json('your post was updated');
+  return;
 });
 
 // 404

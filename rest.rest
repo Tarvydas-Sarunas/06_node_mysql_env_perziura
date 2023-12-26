@@ -4,7 +4,7 @@ GET http://localhost:3000
 GET http://localhost:3000/api/posts
 
 ### pasiimti viena post
-GET http://localhost:3000/api/posts/1
+GET http://localhost:3000/api/posts/6
 
 ### sukuria lentele DB
 GET http://localhost:3000/api/admin/create-table
@@ -29,4 +29,11 @@ Content-Type: application/json
 ### istrinti single post
 DELETE  http://localhost:3000/api/posts/4
 
+### update single post
+PUT  http://localhost:3000/api/posts/6
+Content-Type: application/json
 
+{
+  "title": "Post 5 Update",
+  "author": "Serbentautas 3000"
+}
